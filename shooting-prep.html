@@ -69,7 +69,8 @@
       const isFootball = sport === "足球";
 
       modeInfo.textContent = "当前拍摄模式：" + sport;
-      if (isChameleon) {
+      const showTripodSection = isChameleon && sport === "篮球";
+      if (showTripodSection) {
         tripodSection.classList.remove("hidden");
       }
       if (isFootball) {
@@ -101,7 +102,7 @@
       startShoot.addEventListener("click", () => {
         const tracking = document.querySelectorAll("[data-toggle-group]")[0].querySelector(".pill.active").textContent.trim();
         const field = document.querySelectorAll("[data-toggle-group]")[1].querySelector(".pill.active").textContent.trim();
-        const tripod = isChameleon
+        const tripod = showTripodSection
           ? document.querySelectorAll("[data-toggle-group]")[2].querySelector(".pill.active").textContent.trim()
           : "不适用";
 
