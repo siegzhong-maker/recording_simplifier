@@ -46,8 +46,8 @@
       </section>
 
       <section class="section">
-        <div class="label">场地大小</div>
-        <div class="pill-row" data-toggle-group>
+        <div class="label" id="fieldLabel">场地大小</div>
+        <div class="pill-row" data-toggle-group id="fieldOptions">
           <button class="pill active" type="button">全场</button>
           <button class="pill" type="button">半场</button>
         </div>
@@ -63,11 +63,22 @@
       const isChameleon = (params.get("user") || "").toLowerCase() === "chameleon";
       const modeInfo = document.getElementById("modeInfo");
       const tripodSection = document.getElementById("tripodSection");
+      const fieldLabel = document.getElementById("fieldLabel");
+      const fieldOptions = document.getElementById("fieldOptions");
       const startShoot = document.getElementById("startShoot");
+      const isFootball = sport === "足球";
 
       modeInfo.textContent = "当前拍摄模式：" + sport;
       if (isChameleon) {
         tripodSection.classList.remove("hidden");
+      }
+      if (isFootball) {
+        fieldLabel.textContent = "比赛人数";
+        fieldOptions.innerHTML = `
+          <button class="pill active" type="button">5v5</button>
+          <button class="pill" type="button">7v7</button>
+          <button class="pill" type="button">11v11</button>
+        `;
       }
 
       document.querySelectorAll("[data-toggle-group]").forEach((group) => {
