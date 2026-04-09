@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>选择拍摄模式</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="phone">
+      <div class="statusbar">
+        <span>10:04</span>
+        <div class="status-icons">
+          <span>•••</span>
+          <span class="battery" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <header class="topbar">
+        <button class="back" type="button" aria-label="返回">&#8249;</button>
+        <h2>选择拍摄模式</h2>
+      </header>
+
+      <section class="grid" id="sportGrid">
+        <button class="sport" type="button"><span class="icon">⚽</span><span>足球</span></button>
+        <button class="sport active" type="button"><span class="icon">🏀</span><span>篮球</span></button>
+        <button class="sport" type="button"><span class="icon">🏒</span><span>冰球</span></button>
+        <button class="sport" type="button"><span class="icon">🤾</span><span>手球</span></button>
+        <button class="sport" type="button"><span class="icon">🎾</span><span>网球</span></button>
+        <button class="sport" type="button"><span class="icon">🥌</span><span>匹克球</span></button>
+        <button class="sport" type="button"><span class="icon">🥍</span><span>棍网球</span></button>
+        <button class="sport" type="button"><span class="icon">🏸</span><span>羽毛球</span></button>
+        <button class="sport" type="button"><span class="icon">🏐</span><span>排球</span></button>
+        <button class="sport" type="button"><span class="icon">🏉</span><span>英式橄榄球</span></button>
+      </section>
+
+      <div class="footer-actions">
+        <button class="cta" id="nextStep" type="button">下一步</button>
+      </div>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const isChameleon = (params.get("user") || "").toLowerCase() === "chameleon";
+
+      document.querySelectorAll("[data-toggle-group]").forEach((group) => {
+        group.querySelectorAll(".pill").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
+            btn.classList.add("active");
+          });
+        });
+      });
+
+      const sports = document.querySelectorAll("#sportGrid .sport");
+      const nextStep = document.getElementById("nextStep");
+      sports.forEach((item) => {
+        item.addEventListener("click", () => {
+          sports.forEach((btn) => btn.classList.remove("active"));
+          item.classList.add("active");
+        });
+      });
+
+      document.querySelector(".back").addEventListener("click", () => {
+        window.history.back();
+      });
+
+      nextStep.addEventListener("click", () => {
+        const activeSport = document.querySelector("#sportGrid .sport.active span:last-child")?.textContent || "篮球";
+        const target = new URL("./shooting-prep.html", window.location.href);
+        target.searchParams.set("sport", activeSport);
+        if (isChameleon) {
+          target.searchParams.set("user", "chameleon");
+        }
+        window.location.href = target.toString();
+      });
+    </script>
+  </body>
+  </html>

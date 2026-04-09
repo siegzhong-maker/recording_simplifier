@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>拍摄准备</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="phone">
+      <div class="statusbar">
+        <span>10:04</span>
+        <div class="status-icons">
+          <span>•••</span>
+          <span class="battery" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <header class="topbar">
+        <button class="back" type="button" aria-label="返回">&#8249;</button>
+        <h1>拍摄准备</h1>
+      </header>
+
+      <div class="mini" id="modeInfo"></div>
+
+      <section class="section hidden" id="tripodSection">
+        <div class="label">三脚架高度</div>
+        <div class="pill-row" data-toggle-group>
+          <button class="pill active" type="button">高（3米）</button>
+          <button class="pill" type="button">低（1.4-1.8米）</button>
+        </div>
+        <section class="hint-box">
+          <p class="hint-title">高度说明</p>
+          <p class="hint-text">
+            根据三脚架高度选择高/低后，系统会自动自适应调整俯仰角，减少手动调节步骤，提升跟拍稳定性。
+          </p>
+        </section>
+      </section>
+
+      <section class="section">
+        <div class="label">追踪模式</div>
+        <div class="pill-row" data-toggle-group>
+          <button class="pill active" type="button">多人</button>
+          <button class="pill" type="button">单人</button>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="label">场地大小</div>
+        <div class="pill-row" data-toggle-group>
+          <button class="pill active" type="button">全场</button>
+          <button class="pill" type="button">半场</button>
+        </div>
+      </section>
+
+      <div class="spacer"></div>
+      <button class="cta" id="startShoot" type="button">开始拍摄</button>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const sport = params.get("sport") || "篮球";
+      const isChameleon = (params.get("user") || "").toLowerCase() === "chameleon";
+      const modeInfo = document.getElementById("modeInfo");
+      const tripodSection = document.getElementById("tripodSection");
+      const startShoot = document.getElementById("startShoot");
+
+      modeInfo.textContent = "当前拍摄模式：" + sport;
+      if (isChameleon) {
+        tripodSection.classList.remove("hidden");
+      }
+
+      document.querySelectorAll("[data-toggle-group]").forEach((group) => {
+        group.querySelectorAll(".pill").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
+            btn.classList.add("active");
+          });
+        });
+      });
+
+      document.querySelector(".back").addEventListener("click", () => {
+        const target = new URL("./shooting-mode.html", window.location.href);
+        if (isChameleon) {
+          target.searchParams.set("user", "chameleon");
+        }
+        window.location.href = target.toString();
+      });
+
+      startShoot.addEventListener("click", () => {
+        const tracking = document.querySelectorAll("[data-toggle-group]")[0].querySelector(".pill.active").textContent.trim();
+        const field = document.querySelectorAll("[data-toggle-group]")[1].querySelector(".pill.active").textContent.trim();
+        const tripod = isChameleon
+          ? document.querySelectorAll("[data-toggle-group]")[2].querySelector(".pill.active").textContent.trim()
+          : "不适用";
+
+        alert("开始拍摄\n模式：" + sport + "\n追踪：" + tracking + "\n场地：" + field + "\n三脚架：" + tripod);
+      });
+    </script>
+  </body>
+  </html>

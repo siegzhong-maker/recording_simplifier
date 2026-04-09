@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>拍摄流程演示入口</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .hub {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .hub-card {
+        background: #ececef;
+        border-radius: 14px;
+        padding: 14px 12px;
+      }
+      .hub-title {
+        margin: 0 0 8px;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .hub-text {
+        margin: 0;
+        color: #666b74;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .hub .cta {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone">
+      <div class="statusbar">
+        <span>10:04</span>
+        <div class="status-icons">
+          <span>•••</span>
+          <span class="battery" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <header class="topbar">
+        <h1>流程演示入口</h1>
+      </header>
+
+      <section class="hub-card">
+        <p class="hub-title">普通用户流程</p>
+        <p class="hub-text">选择拍摄模式 -> 拍摄准备（无三脚架高度模块）</p>
+      </section>
+      <a class="cta" href="./shooting-mode.html">进入普通用户流程</a>
+
+      <section class="hub-card">
+        <p class="hub-title">Chameleon 用户流程</p>
+        <p class="hub-text">选择拍摄模式 -> 拍摄准备（含三脚架高度：高 3 米 / 低 1.4-1.8 米）</p>
+      </section>
+      <a class="cta" href="./shooting-mode.html?user=chameleon">进入 Chameleon 流程</a>
+    </main>
+  </body>
+  </html>

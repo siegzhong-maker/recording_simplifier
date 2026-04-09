@@ -1,0 +1,268 @@
+:root {
+  --outer-bg: #dddddf;
+  --page-bg: #f4f4f6;
+  --card: #efeff2;
+  --text: #101114;
+  --subtle: #8f9199;
+  --pill-off: #e8e8eb;
+  --orange: #f58d30;
+  --red: #d61f17;
+  --radius-xl: 24px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--outer-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+
+.phone {
+  width: min(100%, 430px);
+  min-height: 88vh;
+  max-height: 920px;
+  background: var(--page-bg);
+  border-radius: 38px;
+  overflow: hidden;
+  padding: 12px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.statusbar {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #474951;
+}
+
+.battery {
+  width: 20px;
+  height: 10px;
+  border: 1.7px solid #262931;
+  border-radius: 3px;
+  position: relative;
+}
+
+.battery::before {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 4px;
+  right: -4px;
+  top: 2px;
+  background: #262931;
+  border-radius: 0 2px 2px 0;
+}
+
+.battery::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  width: 55%;
+  background: #262931;
+  border-radius: 1.5px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-top: 0;
+  min-height: 34px;
+}
+
+.back {
+  position: absolute;
+  left: 4px;
+  border: 0;
+  background: transparent;
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+  color: #232428;
+}
+
+h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.section {
+  margin-top: 14px;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.pill-row {
+  display: flex;
+  gap: 10px;
+}
+
+.pill {
+  flex: 1;
+  height: 50px;
+  border-radius: var(--radius-xl);
+  border: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #666b74;
+  background: var(--pill-off);
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.pill.active,
+.cta {
+  background: linear-gradient(90deg, var(--orange), var(--red));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(214, 31, 23, 0.28);
+}
+
+.pill:active,
+.cta:active {
+  transform: scale(0.98);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.cta {
+  width: 100%;
+  height: 50px;
+  border: 0;
+  border-radius: var(--radius-xl);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  margin-top: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.sport {
+  border-radius: 14px;
+  border: 0;
+  padding: 9px 4px;
+  background: #ebebee;
+  color: #6c7079;
+  min-height: 72px;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  line-height: 1.15;
+}
+
+.sport .icon {
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0.65;
+}
+
+.sport.active {
+  background: linear-gradient(180deg, #f58d30, #d6251a);
+  color: #fff;
+}
+
+.sport.active .icon {
+  opacity: 1;
+}
+
+.hint-box {
+  margin-top: 8px;
+  border-radius: 14px;
+  background: #ececef;
+  padding: 12px 10px;
+}
+
+.hint-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hint-text {
+  margin: 0;
+  color: #767982;
+  line-height: 1.4;
+  font-size: 12px;
+}
+
+.mini {
+  margin-top: -2px;
+  font-size: 12px;
+  color: #8c8f97;
+}
+
+.footer-actions {
+  margin-top: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 520px) {
+  body {
+    padding: 0;
+    background: var(--page-bg);
+  }
+
+  .phone {
+    width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
