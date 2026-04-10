@@ -267,6 +267,19 @@ h2 {
   color: #a8abb3;
 }
 
+.tripod-hint-cn {
+  display: block;
+}
+
+.tripod-hint-en {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #b4b7bf;
+  letter-spacing: 0.01em;
+}
+
 @media (max-width: 520px) {
   body {
     padding: 0;

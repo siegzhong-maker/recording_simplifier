@@ -29,8 +29,10 @@
           <button class="pill active" type="button" data-tripod="high">高（3米）</button>
           <button class="pill" type="button" data-tripod="low">低（1.4-1.8米）</button>
         </div>
-        <p class="tripod-hint" id="tripodHint" aria-live="polite">
-          选择后系统会辅助优化俯仰视角
+        <p class="tripod-hint" id="tripodHint" aria-live="polite" aria-atomic="true">
+          <span class="tripod-hint-cn" lang="zh-CN">选择后系统会辅助优化俯仰视角，减轻手动调角度。</span>
+          <span class="tripod-hint-en" lang="en"
+            >The system assists with tilt and viewing angle, so you need less manual adjustment.</span>
         </p>
       </section>
 
@@ -64,7 +66,9 @@
       const fieldGroup = document.getElementById("fieldGroup");
       const startShoot = document.getElementById("startShoot");
       const isFootball = sport === "足球";
-      const TRIPOD_HINT_HIGH = "选择后系统会辅助优化俯仰视角";
+      const TRIPOD_HINT_HIGH_CN = "选择后系统会辅助优化俯仰视角，减轻手动调角度。";
+      const TRIPOD_HINT_HIGH_EN =
+        "The system assists with tilt and viewing angle, so you need less manual adjustment.";
 
       modeInfo.textContent = "当前拍摄模式：" + sport;
       const showTripodSection = isChameleon && sport === "篮球";
@@ -72,13 +76,17 @@
       function syncTripodHint() {
         if (!showTripodSection) return;
         const hint = document.getElementById("tripodHint");
+        const hintCn = hint.querySelector(".tripod-hint-cn");
+        const hintEn = hint.querySelector(".tripod-hint-en");
         const active = document.querySelector("#tripodGroup .pill.active");
         const tier = active && active.getAttribute("data-tripod");
         if (tier === "high") {
-          hint.textContent = TRIPOD_HINT_HIGH;
+          hintCn.textContent = TRIPOD_HINT_HIGH_CN;
+          hintEn.textContent = TRIPOD_HINT_HIGH_EN;
           hint.classList.remove("hidden");
         } else if (tier === "low") {
-          hint.textContent = "";
+          hintCn.textContent = "";
+          hintEn.textContent = "";
           hint.classList.add("hidden");
         }
       }
