@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="phone">
+    <main class="phone page-shooting-prep">
       <div class="statusbar">
         <span>10:04</span>
         <div class="status-icons">
@@ -17,38 +17,37 @@
       </div>
 
       <header class="topbar">
-        <button class="back" type="button" aria-label="返回">&#8249;</button>
-        <h1>拍摄准备</h1>
+        <button class="back" type="button" id="backBtn" aria-label="返回">&#8249;</button>
+        <h1 id="pageTitle">拍摄准备</h1>
+        <button class="lang-toggle" type="button" id="langToggle" aria-label="Switch language">EN</button>
       </header>
 
       <div class="mini" id="modeInfo"></div>
 
       <section class="section hidden" id="tripodSection">
-        <div class="label label-tripod">三脚架高度</div>
+        <div class="label label-tripod" id="tripodLabel">三脚架高度</div>
         <div class="pill-row" data-toggle-group id="tripodGroup">
           <button class="pill active" type="button" data-tripod="high">高（3米）</button>
           <button class="pill" type="button" data-tripod="low">低（1.4-1.8米）</button>
         </div>
         <p class="tripod-hint" id="tripodHint" aria-live="polite" aria-atomic="true">
-          <span class="tripod-hint-cn" lang="zh-CN">选择后系统会辅助优化俯仰视角，减轻手动调角度。</span>
-          <span class="tripod-hint-en" lang="en"
-            >The system assists with tilt and viewing angle, so you need less manual adjustment.</span>
+          <span id="tripodHintText"></span>
         </p>
       </section>
 
       <section class="section">
-        <div class="label">追踪模式</div>
+        <div class="label" id="trackingLabel">追踪模式</div>
         <div class="pill-row" data-toggle-group id="trackingGroup">
-          <button class="pill active" type="button">多人</button>
-          <button class="pill" type="button">单人</button>
+          <button class="pill active" type="button" data-tracking="multi">多人</button>
+          <button class="pill" type="button" data-tracking="single">单人</button>
         </div>
       </section>
 
       <section class="section">
         <div class="label" id="fieldLabel">场地大小</div>
         <div class="pill-row" data-toggle-group id="fieldGroup">
-          <button class="pill active" type="button">全场</button>
-          <button class="pill" type="button">半场</button>
+          <button class="pill active" type="button" data-field="full">全场</button>
+          <button class="pill" type="button" data-field="half">半场</button>
         </div>
       </section>
 
@@ -57,6 +56,95 @@
     </main>
 
     <script>
+      const LANG_KEY = "shootingPrep.lang";
+      const TRIPOD_HINT_HIGH = {
+        zh: "选择后系统会辅助优化俯仰视角，减轻手动调角度。",
+        en: "The system assists with tilt and viewing angle, so you need less manual adjustment.",
+      };
+
+      const SPORT_I18N = {
+        篮球: { en: "Basketball" },
+        足球: { en: "Football" },
+        冰球: { en: "Ice hockey" },
+        手球: { en: "Handball" },
+        网球: { en: "Tennis" },
+        匹克球: { en: "Pickleball" },
+        棍网球: { en: "Lacrosse" },
+        羽毛球: { en: "Badminton" },
+        排球: { en: "Volleyball" },
+        英式橄榄球: { en: "Rugby" },
+      };
+
+      const COPY = {
+        zh: {
+          title: "拍摄准备",
+          backAria: "返回",
+          langSwitch: "EN",
+          langSwitchAria: "切换为英文",
+          modeCurrent: "当前拍摄模式：",
+          tripodLabel: "三脚架高度",
+          tripodHigh: "高（3米）",
+          tripodLow: "低（1.4-1.8米）",
+          trackingLabel: "追踪模式",
+          trackingMulti: "多人",
+          trackingSingle: "单人",
+          fieldSize: "场地大小",
+          fieldFull: "全场",
+          fieldHalf: "半场",
+          fieldRoster: "比赛人数",
+          ctaStart: "开始拍摄",
+          tripodNA: "不适用",
+          alertStart: "开始拍摄",
+          alertMode: "模式：",
+          alertTrack: "追踪：",
+          alertField: "场地：",
+          alertTripod: "三脚架：",
+        },
+        en: {
+          title: "Shoot prep",
+          backAria: "Back",
+          langSwitch: "中文",
+          langSwitchAria: "Switch to Chinese",
+          modeCurrent: "Mode: ",
+          tripodLabel: "Tripod height",
+          tripodHigh: "High (3 m)",
+          tripodLow: "Low (1.4–1.8 m)",
+          trackingLabel: "Tracking",
+          trackingMulti: "Multi-player",
+          trackingSingle: "Single player",
+          fieldSize: "Court size",
+          fieldFull: "Full court",
+          fieldHalf: "Half court",
+          fieldRoster: "Match size",
+          ctaStart: "Start shooting",
+          tripodNA: "N/A",
+          alertStart: "Start shooting",
+          alertMode: "Mode: ",
+          alertTrack: "Tracking: ",
+          alertField: "Court: ",
+          alertTripod: "Tripod: ",
+        },
+      };
+
+      function getLang() {
+        try {
+          const s = localStorage.getItem(LANG_KEY);
+          if (s === "en" || s === "zh") return s;
+        } catch (_) {}
+        return "zh";
+      }
+
+      function setLang(next) {
+        try {
+          localStorage.setItem(LANG_KEY, next);
+        } catch (_) {}
+      }
+
+      function sportDisplayName(lang) {
+        if (lang === "zh") return sport;
+        return (SPORT_I18N[sport] && SPORT_I18N[sport].en) || sport;
+      }
+
       const params = new URLSearchParams(window.location.search);
       const sport = params.get("sport") || "篮球";
       const isChameleon = (params.get("user") || "").toLowerCase() === "chameleon";
@@ -65,44 +153,86 @@
       const fieldLabel = document.getElementById("fieldLabel");
       const fieldGroup = document.getElementById("fieldGroup");
       const startShoot = document.getElementById("startShoot");
+      const langToggle = document.getElementById("langToggle");
+      const backBtn = document.getElementById("backBtn");
       const isFootball = sport === "足球";
-      const TRIPOD_HINT_HIGH_CN = "选择后系统会辅助优化俯仰视角，减轻手动调角度。";
-      const TRIPOD_HINT_HIGH_EN =
-        "The system assists with tilt and viewing angle, so you need less manual adjustment.";
 
-      modeInfo.textContent = "当前拍摄模式：" + sport;
       const showTripodSection = isChameleon && sport === "篮球";
 
       function syncTripodHint() {
         if (!showTripodSection) return;
         const hint = document.getElementById("tripodHint");
-        const hintCn = hint.querySelector(".tripod-hint-cn");
-        const hintEn = hint.querySelector(".tripod-hint-en");
+        const hintText = document.getElementById("tripodHintText");
         const active = document.querySelector("#tripodGroup .pill.active");
         const tier = active && active.getAttribute("data-tripod");
+        const lang = getLang();
         if (tier === "high") {
-          hintCn.textContent = TRIPOD_HINT_HIGH_CN;
-          hintEn.textContent = TRIPOD_HINT_HIGH_EN;
+          hintText.textContent = TRIPOD_HINT_HIGH[lang];
           hint.classList.remove("hidden");
         } else if (tier === "low") {
-          hintCn.textContent = "";
-          hintEn.textContent = "";
+          hintText.textContent = "";
           hint.classList.add("hidden");
         }
       }
 
-      if (showTripodSection) {
-        tripodSection.classList.remove("hidden");
-        syncTripodHint();
-      }
-      if (isFootball) {
-        fieldLabel.textContent = "比赛人数";
+      function setFootballFieldPills() {
         fieldGroup.innerHTML = `
-          <button class="pill active" type="button">5v5</button>
-          <button class="pill" type="button">7v7</button>
-          <button class="pill" type="button">11v11</button>
+          <button class="pill active" type="button" data-field="5">5v5</button>
+          <button class="pill" type="button" data-field="7">7v7</button>
+          <button class="pill" type="button" data-field="11">11v11</button>
         `;
       }
+
+      function applyLang() {
+        const lang = getLang();
+        document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+        const c = COPY[lang];
+
+        document.getElementById("pageTitle").textContent = c.title;
+        backBtn.setAttribute("aria-label", c.backAria);
+        langToggle.textContent = c.langSwitch;
+        langToggle.setAttribute("aria-label", c.langSwitchAria);
+
+        modeInfo.textContent = c.modeCurrent + sportDisplayName(lang);
+
+        document.getElementById("tripodLabel").textContent = c.tripodLabel;
+        const th = document.querySelector('#tripodGroup [data-tripod="high"]');
+        const tl = document.querySelector('#tripodGroup [data-tripod="low"]');
+        if (th) th.textContent = c.tripodHigh;
+        if (tl) tl.textContent = c.tripodLow;
+
+        document.getElementById("trackingLabel").textContent = c.trackingLabel;
+        const tm = document.querySelector('#trackingGroup [data-tracking="multi"]');
+        const ts = document.querySelector('#trackingGroup [data-tracking="single"]');
+        if (tm) tm.textContent = c.trackingMulti;
+        if (ts) ts.textContent = c.trackingSingle;
+
+        fieldLabel.textContent = isFootball ? c.fieldRoster : c.fieldSize;
+        if (!isFootball) {
+          const ff = document.querySelector('#fieldGroup [data-field="full"]');
+          const fh = document.querySelector('#fieldGroup [data-field="half"]');
+          if (ff) ff.textContent = c.fieldFull;
+          if (fh) fh.textContent = c.fieldHalf;
+        }
+
+        startShoot.textContent = c.ctaStart;
+        document.title = c.title;
+        syncTripodHint();
+      }
+
+      if (showTripodSection) {
+        tripodSection.classList.remove("hidden");
+      }
+      if (isFootball) {
+        setFootballFieldPills();
+      }
+
+      applyLang();
+
+      langToggle.addEventListener("click", () => {
+        setLang(getLang() === "zh" ? "en" : "zh");
+        applyLang();
+      });
 
       document.querySelector(".phone").addEventListener("click", (e) => {
         const pill = e.target.closest("[data-toggle-group] .pill");
@@ -115,7 +245,7 @@
         }
       });
 
-      document.querySelector(".back").addEventListener("click", () => {
+      backBtn.addEventListener("click", () => {
         const target = new URL("./shooting-mode.html", window.location.href);
         if (isChameleon) {
           target.searchParams.set("user", "chameleon");
@@ -129,11 +259,27 @@
       }
 
       startShoot.addEventListener("click", () => {
+        const lang = getLang();
+        const c = COPY[lang];
         const tracking = activePillLabel(document.getElementById("trackingGroup"));
         const field = activePillLabel(fieldGroup);
-        const tripod = showTripodSection ? activePillLabel(document.getElementById("tripodGroup")) : "不适用";
+        const tripod = showTripodSection ? activePillLabel(document.getElementById("tripodGroup")) : c.tripodNA;
 
-        alert("开始拍摄\n模式：" + sport + "\n追踪：" + tracking + "\n场地：" + field + "\n三脚架：" + tripod);
+        alert(
+          c.alertStart +
+            "\n" +
+            c.alertMode +
+            sportDisplayName(lang) +
+            "\n" +
+            c.alertTrack +
+            tracking +
+            "\n" +
+            c.alertField +
+            field +
+            "\n" +
+            c.alertTripod +
+            tripod
+        );
       });
     </script>
   </body>
