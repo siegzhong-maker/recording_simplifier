@@ -24,31 +24,14 @@
       <div class="mini" id="modeInfo"></div>
 
       <section class="section hidden" id="tripodSection">
-        <div id="tripodSummaryRow" class="tripod-summary-row hidden">
-          <div class="tripod-summary-main">
-            <span class="tripod-summary-muted">三脚架</span>
-            <span id="tripodSummaryValue" class="tripod-summary-value"></span>
-            <span class="tripod-summary-badge">上次已保存</span>
-          </div>
-          <div class="tripod-summary-actions">
-            <button type="button" class="link-btn" id="tripodAdjustBtn">调整</button>
-            <button type="button" class="link-btn link-btn--subtle" id="tripodClearBtn">清除记忆</button>
-          </div>
+        <div class="label label-tripod">三脚架高度</div>
+        <div class="pill-row" data-toggle-group id="tripodGroup">
+          <button class="pill active" type="button">高（3米）</button>
+          <button class="pill" type="button">低（1.4-1.8米）</button>
         </div>
-        <div id="tripodExpanded" class="tripod-expanded">
-          <button type="button" class="link-btn tripod-collapse-btn hidden" id="tripodCollapseBtn">收起</button>
-          <div class="label">三脚架高度</div>
-          <div class="pill-row" data-toggle-group id="tripodGroup">
-            <button class="pill active" type="button" data-tripod-value="high">高（3米）</button>
-            <button class="pill" type="button" data-tripod-value="low">低（1.4-1.8米）</button>
-          </div>
-          <section class="hint-box">
-            <p class="hint-title">高度说明</p>
-            <p class="hint-text">
-              根据三脚架高度选择高/低后，系统会自动自适应调整俯仰角，下俯可获得更好的构图，并减少手动调节步骤。
-            </p>
-          </section>
-        </div>
+        <p class="tripod-hint">
+          选择后系统会自动适配俯仰角，减少手动调节。
+        </p>
       </section>
 
       <section class="section">
@@ -72,20 +55,11 @@
     </main>
 
     <script>
-      const TRIPOD_LS_KEY = "shootingPrep.chameleon.tripod.basketball";
-
       const params = new URLSearchParams(window.location.search);
       const sport = params.get("sport") || "篮球";
       const isChameleon = (params.get("user") || "").toLowerCase() === "chameleon";
       const modeInfo = document.getElementById("modeInfo");
       const tripodSection = document.getElementById("tripodSection");
-      const tripodSummaryRow = document.getElementById("tripodSummaryRow");
-      const tripodSummaryValue = document.getElementById("tripodSummaryValue");
-      const tripodAdjustBtn = document.getElementById("tripodAdjustBtn");
-      const tripodClearBtn = document.getElementById("tripodClearBtn");
-      const tripodExpanded = document.getElementById("tripodExpanded");
-      const tripodCollapseBtn = document.getElementById("tripodCollapseBtn");
-      const tripodGroup = document.getElementById("tripodGroup");
       const fieldLabel = document.getElementById("fieldLabel");
       const fieldGroup = document.getElementById("fieldGroup");
       const startShoot = document.getElementById("startShoot");
@@ -93,71 +67,9 @@
 
       modeInfo.textContent = "当前拍摄模式：" + sport;
       const showTripodSection = isChameleon && sport === "篮球";
-
-      function readTripod() {
-        try {
-          const v = localStorage.getItem(TRIPOD_LS_KEY);
-          if (v === "high" || v === "low") return v;
-        } catch (_) {}
-        return null;
-      }
-
-      function writeTripod(value) {
-        try {
-          if (value === "high" || value === "low") localStorage.setItem(TRIPOD_LS_KEY, value);
-        } catch (_) {}
-      }
-
-      function clearTripod() {
-        try {
-          localStorage.removeItem(TRIPOD_LS_KEY);
-        } catch (_) {}
-      }
-
-      function setTripodPills(value) {
-        tripodGroup.querySelectorAll(".pill").forEach((pill) => {
-          pill.classList.toggle("active", pill.getAttribute("data-tripod-value") === value);
-        });
-      }
-
-      function getTripodValueFromDom() {
-        const active = tripodGroup.querySelector(".pill.active");
-        return active ? active.getAttribute("data-tripod-value") : null;
-      }
-
-      function getTripodLabel() {
-        const active = tripodGroup.querySelector(".pill.active");
-        return active ? active.textContent.trim() : "";
-      }
-
-      function syncTripodSummaryText() {
-        tripodSummaryValue.textContent = getTripodLabel();
-      }
-
-      function showTripodCollapsedUI() {
-        tripodSummaryRow.classList.remove("hidden");
-        tripodExpanded.classList.add("hidden");
-        tripodCollapseBtn.classList.add("hidden");
-        syncTripodSummaryText();
-      }
-
-      function showTripodExpandedUI(fromMemory) {
-        tripodSummaryRow.classList.add("hidden");
-        tripodExpanded.classList.remove("hidden");
-        tripodCollapseBtn.classList.toggle("hidden", !fromMemory);
-      }
-
       if (showTripodSection) {
         tripodSection.classList.remove("hidden");
-        const saved = readTripod();
-        if (saved) {
-          setTripodPills(saved);
-          showTripodCollapsedUI();
-        } else {
-          showTripodExpandedUI(false);
-        }
       }
-
       if (isFootball) {
         fieldLabel.textContent = "比赛人数";
         fieldGroup.innerHTML = `
@@ -173,32 +85,7 @@
         const group = pill.closest("[data-toggle-group]");
         group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
         pill.classList.add("active");
-
-        if (showTripodSection && group.id === "tripodGroup") {
-          const v = pill.getAttribute("data-tripod-value");
-          if (v === "high" || v === "low") {
-            writeTripod(v);
-            syncTripodSummaryText();
-          }
-        }
       });
-
-      if (showTripodSection) {
-        tripodAdjustBtn.addEventListener("click", () => {
-          showTripodExpandedUI(true);
-        });
-        tripodCollapseBtn.addEventListener("click", () => {
-          const v = getTripodValueFromDom();
-          if (v === "high" || v === "low") writeTripod(v);
-          if (readTripod()) showTripodCollapsedUI();
-          else showTripodExpandedUI(false);
-        });
-        tripodClearBtn.addEventListener("click", () => {
-          clearTripod();
-          setTripodPills("high");
-          showTripodExpandedUI(false);
-        });
-      }
 
       document.querySelector(".back").addEventListener("click", () => {
         const target = new URL("./shooting-mode.html", window.location.href);
@@ -216,11 +103,8 @@
       startShoot.addEventListener("click", () => {
         const tracking = activePillLabel(document.getElementById("trackingGroup"));
         const field = activePillLabel(fieldGroup);
-        const tripod = showTripodSection ? getTripodLabel() : "不适用";
-        if (showTripodSection) {
-          const v = getTripodValueFromDom();
-          if (v === "high" || v === "low") writeTripod(v);
-        }
+        const tripod = showTripodSection ? activePillLabel(document.getElementById("tripodGroup")) : "不适用";
+
         alert("开始拍摄\n模式：" + sport + "\n追踪：" + tracking + "\n场地：" + field + "\n三脚架：" + tripod);
       });
     </script>
