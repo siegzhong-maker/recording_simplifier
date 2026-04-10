@@ -283,6 +283,13 @@ h2 {
   color: #9a9da5;
 }
 
+.tripod-intro {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #a8abb3;
+}
+
 .tripod-hint {
   margin: 8px 0 0;
   font-size: 12px;

@@ -26,6 +26,7 @@
 
       <section class="section hidden" id="tripodSection">
         <div class="label label-tripod" id="tripodLabel">三脚架高度</div>
+        <p class="tripod-intro" id="tripodIntro"></p>
         <div class="pill-row" data-toggle-group id="tripodGroup">
           <button class="pill active" type="button" data-tripod="high">高（3米）</button>
           <button class="pill" type="button" data-tripod="low">低（1.4-1.8米）</button>
@@ -58,8 +59,8 @@
     <script>
       const LANG_KEY = "shootingPrep.lang";
       const TRIPOD_HINT_HIGH = {
-        zh: "选择后系统会辅助优化俯仰视角，减轻手动调角度。",
-        en: "The system assists with tilt and viewing angle, so you need less manual adjustment.",
+        zh: "",
+        en: "We'll assist with tilt and viewing angle, so you need less manual adjustment.",
       };
 
       const SPORT_I18N = {
@@ -82,7 +83,8 @@
           langSwitch: "EN",
           langSwitchAria: "切换为英文",
           modeCurrent: "当前拍摄模式：",
-          tripodLabel: "三脚架高度",
+          tripodLabel: "选择三脚架架设",
+          tripodIntro: "选择后系统会辅助优化俯仰视角，减轻手动调角度。",
           tripodHigh: "高（3米）",
           tripodLow: "低（1.4-1.8米）",
           trackingLabel: "追踪模式",
@@ -106,9 +108,11 @@
           langSwitch: "中文",
           langSwitchAria: "Switch to Chinese",
           modeCurrent: "Mode: ",
-          tripodLabel: "Tripod height",
-          tripodHigh: "High (3 m)",
-          tripodLow: "Low (1.4–1.8 m)",
+          tripodLabel: "Select your tripod setup",
+          tripodIntro:
+            "Choose the option that matches your tripod to optimize the camera angle for your court.",
+          tripodHigh: "Elevated tripod (3 m)",
+          tripodLow: "Standard tripod (1.4–1.8 m)",
           trackingLabel: "Tracking",
           trackingMulti: "Multi-player",
           trackingSingle: "Single player",
@@ -159,6 +163,19 @@
 
       const showTripodSection = isChameleon && sport === "篮球";
 
+      function syncTripodIntroVisibility() {
+        if (!showTripodSection) return;
+        const intro = document.getElementById("tripodIntro");
+        const lang = getLang();
+        const active = document.querySelector("#tripodGroup .pill.active");
+        const tier = active && active.getAttribute("data-tripod");
+        if (lang === "zh") {
+          intro.classList.toggle("hidden", tier !== "high");
+        } else {
+          intro.classList.remove("hidden");
+        }
+      }
+
       function syncTripodHint() {
         if (!showTripodSection) return;
         const hint = document.getElementById("tripodHint");
@@ -167,8 +184,9 @@
         const tier = active && active.getAttribute("data-tripod");
         const lang = getLang();
         if (tier === "high") {
-          hintText.textContent = TRIPOD_HINT_HIGH[lang];
-          hint.classList.remove("hidden");
+          const msg = TRIPOD_HINT_HIGH[lang] || "";
+          hintText.textContent = msg;
+          hint.classList.toggle("hidden", !msg.trim());
         } else if (tier === "low") {
           hintText.textContent = "";
           hint.classList.add("hidden");
@@ -196,6 +214,7 @@
         modeInfo.textContent = c.modeCurrent + sportDisplayName(lang);
 
         document.getElementById("tripodLabel").textContent = c.tripodLabel;
+        document.getElementById("tripodIntro").textContent = c.tripodIntro;
         const th = document.querySelector('#tripodGroup [data-tripod="high"]');
         const tl = document.querySelector('#tripodGroup [data-tripod="low"]');
         if (th) th.textContent = c.tripodHigh;
@@ -217,6 +236,7 @@
 
         startShoot.textContent = c.ctaStart;
         document.title = c.title;
+        syncTripodIntroVisibility();
         syncTripodHint();
       }
 
@@ -241,6 +261,7 @@
         group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
         pill.classList.add("active");
         if (group.id === "tripodGroup") {
+          syncTripodIntroVisibility();
           syncTripodHint();
         }
       });
