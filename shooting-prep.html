@@ -26,11 +26,11 @@
       <section class="section hidden" id="tripodSection">
         <div class="label label-tripod">三脚架高度</div>
         <div class="pill-row" data-toggle-group id="tripodGroup">
-          <button class="pill active" type="button">高（3米）</button>
-          <button class="pill" type="button">低（1.4-1.8米）</button>
+          <button class="pill active" type="button" data-tripod="high">高（3米）</button>
+          <button class="pill" type="button" data-tripod="low">低（1.4-1.8米）</button>
         </div>
-        <p class="tripod-hint">
-          选择后系统会自动适配俯仰角，减少手动调节。
+        <p class="tripod-hint" id="tripodHint" aria-live="polite">
+          选择后系统会辅助优化俯仰视角
         </p>
       </section>
 
@@ -64,11 +64,28 @@
       const fieldGroup = document.getElementById("fieldGroup");
       const startShoot = document.getElementById("startShoot");
       const isFootball = sport === "足球";
+      const TRIPOD_HINT_HIGH = "选择后系统会辅助优化俯仰视角";
 
       modeInfo.textContent = "当前拍摄模式：" + sport;
       const showTripodSection = isChameleon && sport === "篮球";
+
+      function syncTripodHint() {
+        if (!showTripodSection) return;
+        const hint = document.getElementById("tripodHint");
+        const active = document.querySelector("#tripodGroup .pill.active");
+        const tier = active && active.getAttribute("data-tripod");
+        if (tier === "high") {
+          hint.textContent = TRIPOD_HINT_HIGH;
+          hint.classList.remove("hidden");
+        } else if (tier === "low") {
+          hint.textContent = "";
+          hint.classList.add("hidden");
+        }
+      }
+
       if (showTripodSection) {
         tripodSection.classList.remove("hidden");
+        syncTripodHint();
       }
       if (isFootball) {
         fieldLabel.textContent = "比赛人数";
@@ -85,6 +102,9 @@
         const group = pill.closest("[data-toggle-group]");
         group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
         pill.classList.add("active");
+        if (group.id === "tripodGroup") {
+          syncTripodHint();
+        }
       });
 
       document.querySelector(".back").addEventListener("click", () => {
