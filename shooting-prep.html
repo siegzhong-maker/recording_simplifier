@@ -24,22 +24,36 @@
       <div class="mini" id="modeInfo"></div>
 
       <section class="section hidden" id="tripodSection">
-        <div class="label">三脚架高度</div>
-        <div class="pill-row" data-toggle-group>
-          <button class="pill active" type="button">高（3米）</button>
-          <button class="pill" type="button">低（1.4-1.8米）</button>
+        <div id="tripodSummaryRow" class="tripod-summary-row hidden">
+          <div class="tripod-summary-main">
+            <span class="tripod-summary-muted">三脚架</span>
+            <span id="tripodSummaryValue" class="tripod-summary-value"></span>
+            <span class="tripod-summary-badge">上次已保存</span>
+          </div>
+          <div class="tripod-summary-actions">
+            <button type="button" class="link-btn" id="tripodAdjustBtn">调整</button>
+            <button type="button" class="link-btn link-btn--subtle" id="tripodClearBtn">清除记忆</button>
+          </div>
         </div>
-        <section class="hint-box">
-          <p class="hint-title">高度说明</p>
-          <p class="hint-text">
-            根据三脚架高度选择高/低后，系统会自动自适应调整俯仰角，下俯可获得更好的构图，并减少手动调节步骤。
-          </p>
-        </section>
+        <div id="tripodExpanded" class="tripod-expanded">
+          <button type="button" class="link-btn tripod-collapse-btn hidden" id="tripodCollapseBtn">收起</button>
+          <div class="label">三脚架高度</div>
+          <div class="pill-row" data-toggle-group id="tripodGroup">
+            <button class="pill active" type="button" data-tripod-value="high">高（3米）</button>
+            <button class="pill" type="button" data-tripod-value="low">低（1.4-1.8米）</button>
+          </div>
+          <section class="hint-box">
+            <p class="hint-title">高度说明</p>
+            <p class="hint-text">
+              根据三脚架高度选择高/低后，系统会自动自适应调整俯仰角，下俯可获得更好的构图，并减少手动调节步骤。
+            </p>
+          </section>
+        </div>
       </section>
 
       <section class="section">
         <div class="label">追踪模式</div>
-        <div class="pill-row" data-toggle-group>
+        <div class="pill-row" data-toggle-group id="trackingGroup">
           <button class="pill active" type="button">多人</button>
           <button class="pill" type="button">单人</button>
         </div>
@@ -47,7 +61,7 @@
 
       <section class="section">
         <div class="label" id="fieldLabel">场地大小</div>
-        <div class="pill-row" data-toggle-group id="fieldOptions">
+        <div class="pill-row" data-toggle-group id="fieldGroup">
           <button class="pill active" type="button">全场</button>
           <button class="pill" type="button">半场</button>
         </div>
@@ -58,38 +72,133 @@
     </main>
 
     <script>
+      const TRIPOD_LS_KEY = "shootingPrep.chameleon.tripod.basketball";
+
       const params = new URLSearchParams(window.location.search);
       const sport = params.get("sport") || "篮球";
       const isChameleon = (params.get("user") || "").toLowerCase() === "chameleon";
       const modeInfo = document.getElementById("modeInfo");
       const tripodSection = document.getElementById("tripodSection");
+      const tripodSummaryRow = document.getElementById("tripodSummaryRow");
+      const tripodSummaryValue = document.getElementById("tripodSummaryValue");
+      const tripodAdjustBtn = document.getElementById("tripodAdjustBtn");
+      const tripodClearBtn = document.getElementById("tripodClearBtn");
+      const tripodExpanded = document.getElementById("tripodExpanded");
+      const tripodCollapseBtn = document.getElementById("tripodCollapseBtn");
+      const tripodGroup = document.getElementById("tripodGroup");
       const fieldLabel = document.getElementById("fieldLabel");
-      const fieldOptions = document.getElementById("fieldOptions");
+      const fieldGroup = document.getElementById("fieldGroup");
       const startShoot = document.getElementById("startShoot");
       const isFootball = sport === "足球";
 
       modeInfo.textContent = "当前拍摄模式：" + sport;
       const showTripodSection = isChameleon && sport === "篮球";
+
+      function readTripod() {
+        try {
+          const v = localStorage.getItem(TRIPOD_LS_KEY);
+          if (v === "high" || v === "low") return v;
+        } catch (_) {}
+        return null;
+      }
+
+      function writeTripod(value) {
+        try {
+          if (value === "high" || value === "low") localStorage.setItem(TRIPOD_LS_KEY, value);
+        } catch (_) {}
+      }
+
+      function clearTripod() {
+        try {
+          localStorage.removeItem(TRIPOD_LS_KEY);
+        } catch (_) {}
+      }
+
+      function setTripodPills(value) {
+        tripodGroup.querySelectorAll(".pill").forEach((pill) => {
+          pill.classList.toggle("active", pill.getAttribute("data-tripod-value") === value);
+        });
+      }
+
+      function getTripodValueFromDom() {
+        const active = tripodGroup.querySelector(".pill.active");
+        return active ? active.getAttribute("data-tripod-value") : null;
+      }
+
+      function getTripodLabel() {
+        const active = tripodGroup.querySelector(".pill.active");
+        return active ? active.textContent.trim() : "";
+      }
+
+      function syncTripodSummaryText() {
+        tripodSummaryValue.textContent = getTripodLabel();
+      }
+
+      function showTripodCollapsedUI() {
+        tripodSummaryRow.classList.remove("hidden");
+        tripodExpanded.classList.add("hidden");
+        tripodCollapseBtn.classList.add("hidden");
+        syncTripodSummaryText();
+      }
+
+      function showTripodExpandedUI(fromMemory) {
+        tripodSummaryRow.classList.add("hidden");
+        tripodExpanded.classList.remove("hidden");
+        tripodCollapseBtn.classList.toggle("hidden", !fromMemory);
+      }
+
       if (showTripodSection) {
         tripodSection.classList.remove("hidden");
+        const saved = readTripod();
+        if (saved) {
+          setTripodPills(saved);
+          showTripodCollapsedUI();
+        } else {
+          showTripodExpandedUI(false);
+        }
       }
+
       if (isFootball) {
         fieldLabel.textContent = "比赛人数";
-        fieldOptions.innerHTML = `
+        fieldGroup.innerHTML = `
           <button class="pill active" type="button">5v5</button>
           <button class="pill" type="button">7v7</button>
           <button class="pill" type="button">11v11</button>
         `;
       }
 
-      document.querySelectorAll("[data-toggle-group]").forEach((group) => {
-        group.querySelectorAll(".pill").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
-            btn.classList.add("active");
-          });
-        });
+      document.querySelector(".phone").addEventListener("click", (e) => {
+        const pill = e.target.closest("[data-toggle-group] .pill");
+        if (!pill) return;
+        const group = pill.closest("[data-toggle-group]");
+        group.querySelectorAll(".pill").forEach((item) => item.classList.remove("active"));
+        pill.classList.add("active");
+
+        if (showTripodSection && group.id === "tripodGroup") {
+          const v = pill.getAttribute("data-tripod-value");
+          if (v === "high" || v === "low") {
+            writeTripod(v);
+            syncTripodSummaryText();
+          }
+        }
       });
+
+      if (showTripodSection) {
+        tripodAdjustBtn.addEventListener("click", () => {
+          showTripodExpandedUI(true);
+        });
+        tripodCollapseBtn.addEventListener("click", () => {
+          const v = getTripodValueFromDom();
+          if (v === "high" || v === "low") writeTripod(v);
+          if (readTripod()) showTripodCollapsedUI();
+          else showTripodExpandedUI(false);
+        });
+        tripodClearBtn.addEventListener("click", () => {
+          clearTripod();
+          setTripodPills("high");
+          showTripodExpandedUI(false);
+        });
+      }
 
       document.querySelector(".back").addEventListener("click", () => {
         const target = new URL("./shooting-mode.html", window.location.href);
@@ -99,15 +208,21 @@
         window.location.href = target.toString();
       });
 
-      startShoot.addEventListener("click", () => {
-        const tracking = document.querySelectorAll("[data-toggle-group]")[0].querySelector(".pill.active").textContent.trim();
-        const field = document.querySelectorAll("[data-toggle-group]")[1].querySelector(".pill.active").textContent.trim();
-        const tripod = showTripodSection
-          ? document.querySelectorAll("[data-toggle-group]")[2].querySelector(".pill.active").textContent.trim()
-          : "不适用";
+      function activePillLabel(groupEl) {
+        const a = groupEl.querySelector(".pill.active");
+        return a ? a.textContent.trim() : "";
+      }
 
+      startShoot.addEventListener("click", () => {
+        const tracking = activePillLabel(document.getElementById("trackingGroup"));
+        const field = activePillLabel(fieldGroup);
+        const tripod = showTripodSection ? getTripodLabel() : "不适用";
+        if (showTripodSection) {
+          const v = getTripodValueFromDom();
+          if (v === "high" || v === "low") writeTripod(v);
+        }
         alert("开始拍摄\n模式：" + sport + "\n追踪：" + tracking + "\n场地：" + field + "\n三脚架：" + tripod);
       });
     </script>
   </body>
-  </html>
+</html>
