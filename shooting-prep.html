@@ -60,7 +60,7 @@
       const LANG_KEY = "shootingPrep.lang";
       const TRIPOD_HINT_HIGH = {
         zh: "",
-        en: "After you choose, the system assists with adjusting the pitch angle.",
+        en: "Includes tilt assist for this setup.",
       };
 
       const SPORT_I18N = {
@@ -108,11 +108,10 @@
           langSwitch: "中文",
           langSwitchAria: "Switch to Chinese",
           modeCurrent: "Mode: ",
-          tripodLabel: "Select your tripod setup",
-          tripodIntro:
-            "Choose the option that matches your tripod height for this court.",
-          tripodHigh: "Elevated tripod (3 m)",
-          tripodLow: "Standard tripod (1.4–1.8 m)",
+          tripodLabel: "Tripod height",
+          tripodIntro: "",
+          tripodHigh: "High (3 m)",
+          tripodLow: "Standard (1.4–1.8 m)",
           trackingLabel: "Tracking",
           trackingMulti: "Multi-player",
           trackingSingle: "Single player",
@@ -169,10 +168,11 @@
         const lang = getLang();
         const active = document.querySelector("#tripodGroup .pill.active");
         const tier = active && active.getAttribute("data-tripod");
+        const introHasCopy = intro.textContent.trim().length > 0;
         if (lang === "zh") {
-          intro.classList.toggle("hidden", tier !== "high");
+          intro.classList.toggle("hidden", tier !== "high" || !introHasCopy);
         } else {
-          intro.classList.remove("hidden");
+          intro.classList.toggle("hidden", !introHasCopy);
         }
       }
 
